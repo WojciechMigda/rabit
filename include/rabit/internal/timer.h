@@ -6,6 +6,13 @@
  */
 #ifndef RABIT_INTERNAL_TIMER_H_
 #define RABIT_INTERNAL_TIMER_H_
+
+#include "base.h"
+
+#if DMLC_USE_CXX11
+#include <chrono>
+#endif
+
 #include <time.h>
 #ifdef __MACH__
 #include <mach/clock.h>
@@ -19,7 +26,10 @@ namespace utils {
  * \brief return time in seconds, not cross platform, avoid to use this in most places
  */
 inline double GetTime(void) {
-  #ifdef __MACH__
+  #if DMLC_USE_CXX11
+  return std::chrono::duration<double>(
+      std::chrono::high_resolution_clock::now().time_since_epoch()).count();
+  #elif defined __MACH__
   clock_serv_t cclock;
   mach_timespec_t mts;
   host_get_clock_service(mach_host_self(), CALENDAR_CLOCK, &cclock);
